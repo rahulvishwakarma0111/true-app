@@ -1,13 +1,16 @@
 // Vercel serverless function to proxy /api/search to the Elasticsearch cluster
 // Mirrors the Vite dev proxy used during local development.
-// Ensure you set VITE_API_KEY in the Vercel environment variables.
+// Recommended: set a server-only env var named `ELASTIC_API_KEY` (not VITE_*)
+// for improved security. For backward compatibility the function will fall
+// back to `VITE_API_KEY` if `ELASTIC_API_KEY` is not present.
 
 const ES_BASE = 'https://my-elasticsearch-project-ad20fd.es.us-central1.gcp.elastic.cloud:443'
 const ES_PATH = '/true_th_api_1_products/_search'
 
 module.exports = async (req, res) => {
   try {
-    const apiKey = process.env.VITE_API_KEY
+  // Prefer a server-only env var to avoid exposing secrets to the client build.
+  const apiKey = process.env.ELASTIC_API_KEY || process.env.VITE_API_KEY
 
     // Build upstream URL and preserve query params (e.g. scroll=1m)
     const upstreamUrl = new URL(ES_BASE + ES_PATH)
