@@ -4,25 +4,9 @@ import axios from 'axios'
 // Reads the API key from Vite env: import.meta.env.VITE_API_KEY
 // Usage: import { postSearch } from '../api/searchApi';
 
-// Build the API URL. By default we call the real Elasticsearch endpoint
-// directly (this will be used in development and production unless you
-// override). If you prefer the previous proxied behavior, set
-// VITE_USE_PROXY=true in your env and ensure your dev server provides
-// the `/api/search` proxy (Vite dev proxy or a serverless function).
-const ES_BASE = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_ES_BASE)
-  ? import.meta.env.VITE_ES_BASE
-  : 'https://my-elasticsearch-project-ad20fd.es.us-central1.gcp.elastic.cloud:443'
-const ES_PATH = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_ES_PATH)
-  ? import.meta.env.VITE_ES_PATH
-  : '/true_th_api_1_products/_search'
-
-// Prefer the proxy in deployed/browser builds by default (avoids CORS).
-// VITE_USE_PROXY (true/false) can still explicitly override this behavior.
-const USE_PROXY = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_USE_PROXY)
-  ? import.meta.env.VITE_USE_PROXY === 'true'
-  : (typeof window !== 'undefined' && window.location && window.location.hostname !== 'localhost')
-
-const API_URL = USE_PROXY ? '/api/search' : `${ES_BASE}${ES_PATH}`
+// Use a relative URL which will be proxied in development by Vite.
+// The dev proxy rewrites `/api/search` to the real Elasticsearch path.
+const API_URL = '/api/search'
 
 function getApiKey() {
   // Vite exposes env vars with the VITE_ prefix via import.meta.env
