@@ -16,9 +16,11 @@ const ES_PATH = (typeof import.meta !== 'undefined' && import.meta.env && import
   ? import.meta.env.VITE_ES_PATH
   : '/true_th_api_1_products/_search'
 
+// Prefer the proxy in deployed/browser builds by default (avoids CORS).
+// VITE_USE_PROXY (true/false) can still explicitly override this behavior.
 const USE_PROXY = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_USE_PROXY)
   ? import.meta.env.VITE_USE_PROXY === 'true'
-  : false
+  : (typeof window !== 'undefined' && window.location && window.location.hostname !== 'localhost')
 
 const API_URL = USE_PROXY ? '/api/search' : `${ES_BASE}${ES_PATH}`
 
