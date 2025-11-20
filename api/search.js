@@ -58,6 +58,16 @@ module.exports = async (req, res) => {
 
     const upstreamResp = await fetch(upstreamUrl.toString(), fetchOptions)
 
+    // If upstream returned an error status, capture the body for logs
+    let upstreamBodyBuffer = undefined
+    try {
+      const arr = await upstreamResp.arrayBuffer()
+      upstreamBodyBuffer = Buffer.from(arr)
+    } catch (e) {
+      // ignore body read errors
+      upstreamBodyBuffer = undefined
+    }
+
     // Forward status
     res.statusCode = upstreamResp.status
 
@@ -72,14 +82,39 @@ module.exports = async (req, res) => {
     // Ensure CORS headers are present on responses from the proxy
     Object.entries(corsHeaders).forEach(([k, v]) => res.setHeader(k, v))
 
-    const arrayBuf = await upstreamResp.arrayBuffer()
-    res.end(Buffer.from(arrayBuf))
+    // If upstream returned non-2xx, log useful debug info and return a JSON error
+    if (!upstreamResp.ok) {
+      const upstreamText = upstreamBodyBuffer ? upstreamBodyBuffer.toString('utf8') : '<no body>'
+      // Log upstream status and body for debugging
+      // eslint-disable-next-line no-console
+      console.error('api/search upstream error', { status: upstreamResp.status, url: upstreamUrl.toString(), body: upstreamText })
+
+      // In production we avoid echoing upstream details to the client. In non-production include details.
+      const safeBody = (process.env.NODE_ENV && process.env.NODE_ENV === 'production')
+        ? { error: 'upstream_error', status: upstreamResp.status }
+        : { error: 'upstream_error', status: upstreamResp.status, upstream: upstreamText }
+
+      res.setHeader('content-type', 'application/json')
+      res.end(JSON.stringify(safeBody))
+      return
+    }
+
+    // Success: stream the body back to the client
+    if (upstreamBodyBuffer) {
+      res.end(upstreamBodyBuffer)
+    } else {
+      res.end()
+    }
   } catch (err) {
     // eslint-disable-next-line no-console
     console.error('api/search proxy error:', err)
     res.statusCode = 500
     res.setHeader('content-type', 'application/json')
     Object.entries(corsHeaders).forEach(([k, v]) => res.setHeader(k, v))
-    res.end(JSON.stringify({ error: 'proxy_failed', message: err?.message || String(err) }))
+    // Avoid leaking internals in production
+    const safeMessage = (process.env.NODE_ENV && process.env.NODE_ENV === 'production')
+      ? { error: 'proxy_failed' }
+      : { error: 'proxy_failed', message: err?.message || String(err) }
+    res.end(JSON.stringify(safeMessage))
   }
 }
