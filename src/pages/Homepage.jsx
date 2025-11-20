@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import './Homepage.css'
-import { postSearch, normalizeQuery } from '../api/searchApi'
+import { postSearch } from '../api/searchApi'
 
 
 const Homepage = () => {
@@ -104,9 +104,7 @@ const Homepage = () => {
   // Trigger a search using the centralized API wrapper with the required
   // static body shape. If query is empty, clear results.
   async function handleSearch(query) {
-    const raw = typeof query === 'string' ? query.trim() : ''
-    // normalize common patterns like "iphone13" -> "iphone 13"
-    const q = normalizeQuery(raw)
+    const q = typeof query === 'string' ? query.trim() : ''
     if (!q) {
       // don't call API for empty query; clear results
       setApiHits(null)
@@ -120,7 +118,6 @@ const Homepage = () => {
         size: 20,
         query: {
           multi_match: {
-            // use the normalized query for better matching of model+number tokens
             query: q,
             fields: [
               'title.th',
