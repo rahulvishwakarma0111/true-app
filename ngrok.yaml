@@ -1,0 +1,9 @@
+version: 3
+agent:
+  authtoken: 2tWpNYsw8Wp4zftnW6N479yR1zA_6wdLzG9cnZZKsUZku1Riu
+endpoints:
+  - name: f5_tts
+    url: mite-intense-polliwog.ngrok-free.app
+    upstream:
+      url: 3000
+ 

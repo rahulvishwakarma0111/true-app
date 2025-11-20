@@ -1,0 +1,33 @@
+/* Minimal sticky header styles for Navbar component */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 9999; /* keep above other content */
+  background: #fff; /* keep header opaque so content behind doesn't show through */
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+
+/* subtle separation and small shadow so it's visually pinned */
+.site-header .topbar {
+  border-bottom: 1px solid rgba(0,0,0,0.04);
+}
+
+.site-header .mainbar {
+  box-shadow: 0 6px 18px rgba(12,18,28,0.06);
+}
+
+/* keep inner layout consistent with the rest of the app */
+.topbar-inner,
+.mainbar-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ensure the sticky header doesn't overlap content when using in-page anchors */
+/* the content sections can use scroll-margin-top if needed (example below) */
+/* main content sections can add: scroll-margin-top: 80px; */

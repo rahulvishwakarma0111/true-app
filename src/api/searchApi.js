@@ -1,0 +1,52 @@
+import axios from 'axios'
+
+// Centralized API wrapper for Elasticsearch _search POST
+// Reads the API key from Vite env: import.meta.env.VITE_API_KEY
+// Usage: import { postSearch } from '../api/searchApi';
+
+// Use a relative URL which will be proxied in development by Vite.
+// The dev proxy rewrites `/api/search` to the real Elasticsearch path.
+const API_URL = '/api/search'
+
+function getApiKey() {
+  // Vite exposes env vars with the VITE_ prefix via import.meta.env
+  // In Node contexts process.env may also be available; we try both for flexibility.
+  const key = typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_KEY
+    ? import.meta.env.VITE_API_KEY
+    : (typeof process !== 'undefined' && process.env && process.env.VITE_API_KEY ? process.env.VITE_API_KEY : undefined)
+
+  if (!key) {
+    // Don't throw here — allow caller to handle failures. Warn to help debugging.
+    // eslint-disable-next-line no-console
+    console.warn('[searchApi] VITE_API_KEY is not set. Requests will be sent without Authorization header.')
+  }
+
+  return key
+}
+
+export async function postSearch(body = {}) {
+  const apiKey = getApiKey()
+
+  const headers = {
+    'Content-Type': 'application/json',
+  }
+
+  if (apiKey) headers['Authorization'] = `ApiKey ${apiKey}`
+
+  try {
+  // Send scroll as a request param for this specific search call. Using
+  // axios `params` keeps the API URL clean while the dev proxy will
+  // forward the path to `/products/_search` and the query param will be
+  // preserved.
+  const resp = await axios.post(API_URL, body, { headers, params: { scroll: '1m' } })
+    return resp.data
+  } catch (err) {
+    // Re-throw with a clearer message for callers
+    const message = err?.response?.data || err?.message || 'Unknown error'
+    const e = new Error(`searchApi.postSearch failed: ${JSON.stringify(message)}`)
+    e.cause = err
+    throw e
+  }
+}
+
+export default { postSearch }
