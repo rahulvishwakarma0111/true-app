@@ -48,4 +48,17 @@ export const searchProducts = createAsyncThunk(
   }
 )
 
+export const searchAutocomplete = createAsyncThunk(
+  'homepage/searchAutocomplete',
+  async (q, { rejectWithValue }) => {
+    try {
+      // encode query and pass as `q` param
+      const resp = await axios.get(`${API_BASE}/products/autocomplete`, { params: { q }, headers: buildHeaders() })
+      return resp.data
+    } catch (err) {
+      return rejectWithValue(err.response?.data || err.message)
+    }
+  }
+)
+
 export default { fetchAllProducts, searchProducts }

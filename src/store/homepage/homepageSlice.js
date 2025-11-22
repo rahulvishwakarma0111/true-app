@@ -1,8 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { fetchAllProducts, searchProducts } from './homepageThunk'
+import { fetchAllProducts, searchAutocomplete, searchProducts } from './homepageThunk'
 
 const initialState = {
-    productList: [], // products from /products/all
+    productList: [], 
+    autoCompleteList: [],
     loading: false,
     error: null,
 }
@@ -45,6 +46,21 @@ const homepageSlice = createSlice({
                 state.productList = action.payload?.hits?.hits || []
             })
             .addCase(searchProducts.rejected, (state, action) => {
+                state.loading = false
+                state.error = action.payload || action.error?.message
+            })
+
+            // searchAutocomplete
+            .addCase(searchAutocomplete.pending, (state) => {
+                state.loading = true
+                state.error = null
+            })
+            .addCase(searchAutocomplete.fulfilled, (state, action) => {
+                state.loading = false
+                console.log("action autocomplete", action.payload?.hits?.hits);
+                state.autoCompleteList = action.payload?.hits?.hits || []
+            })
+            .addCase(searchAutocomplete.rejected, (state, action) => {
                 state.loading = false
                 state.error = action.payload || action.error?.message
             })
