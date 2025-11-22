@@ -1,6 +1,10 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 
 const ProductsCard = ({productList, loading, error}) => {
+
+    const navigate = useNavigate()
+
     return (
         <section className="products-section">
             <div className="products-inner">
@@ -40,7 +44,7 @@ const ProductsCard = ({productList, loading, error}) => {
                             const discountPercent = src.discount_percent
 
                             return (
-                                <article className="product-card" key={p?._id}>
+                                <article className="product-card" key={p?._id} onClick={() => navigate(`/view-product/${p?._id}`, { state: { p } })}>
                                     <div className="product-image">
                                         <img src={imageUrl} alt={displayTitle} />
                                     </div>

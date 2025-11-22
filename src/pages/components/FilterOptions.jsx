@@ -12,11 +12,38 @@ const FilterOptions = ({
   setSelectedBrand,
   sortBy,
   setSortBy,
+  onTogglePriceSort,
+  onShowLatest,
+  onShowPopularity,
   categories,
   brands
 }) => {
+
+  const handlePriceClick = (e) => {
+    e.preventDefault()
+    if (onTogglePriceSort) onTogglePriceSort()
+    else {
+      // fallback: toggle here if parent didn't provide helper
+      setSortBy((s) => (s === 'price_asc' ? 'price_desc' : 'price_asc'))
+    }
+  }
+
+  const handleLatestClick = (e) => {
+    e.preventDefault()
+    if (onShowLatest) onShowLatest()
+    else setSortBy('latest')
+  }
+
+  const handlePopularityClick = (e) => {
+    e.preventDefault()
+    if (onShowPopularity) onShowPopularity()
+    else setSortBy('popularity')
+  }
+
+  const priceIcon = sortBy === 'price_asc' ? '↓' : sortBy === 'price_desc' ? '↑' : '↓'
+
   return (
-    <div className="filters-bar" ref={wrapperRef}>
+    <div className="filter-options" ref={wrapperRef} style={{ padding: '18px 16px' }}>
       <div className="filters-inner">
         <div className="filter-item">
           <div className="filter-label">Categories</div>
@@ -71,9 +98,17 @@ const FilterOptions = ({
         <div className="sort-area">
           <div className="sort-label">Sort By</div>
           <div className="sort-pills">
-            {['Popularity', 'Lastest', 'Price'].map((s) => (
-              <button key={s} className={`sort-pill ${sortBy === s ? 'active' : ''}`} onClick={() => setSortBy(s)}>{s}</button>
-            ))}
+            <button className={`sort-pill ${sortBy === 'popularity' ? 'active' : ''}`} onClick={handlePopularityClick} aria-pressed={sortBy === 'popularity'}>
+              Popularity
+            </button>
+
+            <button className={`sort-pill ${sortBy === 'latest' ? 'active' : ''}`} onClick={handleLatestClick} aria-pressed={sortBy === 'latest'}>
+              Latest
+            </button>
+
+            <button className={`sort-pill ${sortBy === 'price_asc' || sortBy === 'price_desc' ? 'active' : ''}`} onClick={handlePriceClick} aria-pressed={sortBy === 'price_asc' || sortBy === 'price_desc'}>
+              Price <span style={{ marginLeft: 6 }}>{priceIcon}</span>
+            </button>
           </div>
         </div>
       </div>

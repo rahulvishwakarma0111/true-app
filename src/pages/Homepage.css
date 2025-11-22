@@ -15,8 +15,7 @@
 .searchbar-wrapper {
   flex: 1 1 auto;
   display: flex;
-  justify-content: center;
-  /* center the search across available space */
+  justify-content: space-between;
 }
 
 .search-input-wrapper {

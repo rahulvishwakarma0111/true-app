@@ -5,6 +5,7 @@ const initialState = {
     productList: [], 
     autoCompleteList: [],
     loading: false,
+    autocompleteLoading: false,
     error: null,
 }
 
@@ -52,16 +53,16 @@ const homepageSlice = createSlice({
 
             // searchAutocomplete
             .addCase(searchAutocomplete.pending, (state) => {
-                state.loading = true
+                state.autocompleteLoading = true
                 state.error = null
             })
             .addCase(searchAutocomplete.fulfilled, (state, action) => {
-                state.loading = false
+                state.autocompleteLoading = false
                 console.log("action autocomplete", action.payload?.hits?.hits);
                 state.autoCompleteList = action.payload?.hits?.hits || []
             })
             .addCase(searchAutocomplete.rejected, (state, action) => {
-                state.loading = false
+                state.autocompleteLoading = false
                 state.error = action.payload || action.error?.message
             })
     },
