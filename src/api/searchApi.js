@@ -6,7 +6,7 @@ import axios from 'axios'
 
 // Use a relative URL which will be proxied in development by Vite.
 // The dev proxy rewrites `/api/search` to the real Elasticsearch path.
-const API_URL = '/api/search'
+const API_URL = 'https://mite-intense-polliwog.ngrok-free.app/'
 
 function getApiKey() {
   // Vite exposes env vars with the VITE_ prefix via import.meta.env
@@ -18,7 +18,7 @@ function getApiKey() {
   if (!key) {
     // Don't throw here — allow caller to handle failures. Warn to help debugging.
     // eslint-disable-next-line no-console
-    console.warn('[searchApi] VITE_API_KEY is not set. Requests will be sent without Authorization header.')
+    console.warn('[searchApi] VITE_API_KEY is not set. Requests will be sent without x-api-key header.')
   }
 
   return key
@@ -31,7 +31,7 @@ export async function postSearch(body = {}) {
     'Content-Type': 'application/json',
   }
 
-  if (apiKey) headers['Authorization'] = `ApiKey ${apiKey}`
+  if (apiKey) headers['x-api-key'] = apiKey
 
   try {
   // Send scroll as a request param for this specific search call. Using
