@@ -213,23 +213,39 @@ const Homepage = () => {
     // don't mutate original
     const list = [...productList]
 
+    // Filter by selectedCategory (uses _source?.plaza_category[0]?.name?.en)
+    const filteredList = list.filter((item) => {
+      if (selectedCategory && selectedCategory !== 'All Categories') {
+        const plazaCategory = getField(item, 'plaza_category')
+        console.log("plazaCategory",plazaCategory);
+        const first = Array.isArray(plazaCategory) ? plazaCategory[0] : undefined
+        const catName = first?.name?.en ?? first?.name?.th ?? first?.name
+        // if category name doesn't match selectedCategory, exclude
+        if (!catName || catName !== selectedCategory) return false
+      }
+      return true
+    })
+
+    // work on the filtered copy for sorting
+    const toSort = [...filteredList]
+
     if (sortBy === 'popularity') {
       // sort by common popularity fields (descending = most popular first)
-      list.sort((a, b) => {
+      toSort.sort((a, b) => {
         const pa = parseFloat(getField(a, 'popularity') ?? getField(a, 'popularity_score') ?? getField(a, 'views') ?? getField(a, 'sold') ?? getField(a, 'sold_count') ?? 0) || 0
         const pb = parseFloat(getField(b, 'popularity') ?? getField(b, 'popularity_score') ?? getField(b, 'views') ?? getField(b, 'sold') ?? getField(b, 'sold_count') ?? 0) || 0
         return pb - pa
       })
     } else if (sortBy === 'latest') {
       // sort by update_date (newest first)
-      list.sort((a, b) => {
+      toSort.sort((a, b) => {
         const da = new Date(getField(a, 'update_date') || getField(a, 'updated_at') || 0).getTime()
         const db = new Date(getField(b, 'update_date') || getField(b, 'updated_at') || 0).getTime()
         return db - da
       })
     } else if (sortBy === 'price_asc' || sortBy === 'price_desc') {
       // sort by price (numeric)
-      list.sort((a, b) => {
+      toSort.sort((a, b) => {
         const pa = parseFloat(getField(a, 'price') ?? getField(a, 'sale_price') ?? getField(a, 'price_value') ?? 0) || 0
         const pb = parseFloat(getField(b, 'price') ?? getField(b, 'sale_price') ?? getField(b, 'price_value') ?? 0) || 0
         return sortBy === 'price_asc' ? pa - pb : pb - pa
@@ -238,8 +254,8 @@ const Homepage = () => {
       // default: return as-is (server order / fetched order)
     }
 
-    return list
-  }, [productList, sortBy])
+    return toSort
+  }, [productList, sortBy, selectedCategory])
 
   // toggle price sort between asc/desc
   const togglePriceSort = useCallback(() => {

@@ -315,11 +315,11 @@ const ViewProduct = () => {
 
                         <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
                             <button style={styles.primaryButton} aria-label="Add to cart">
-                                🛒 Add to Cart
+                                Add to Cart
                                 {computedTotal != null && <span style={{ marginLeft: 10, fontWeight: 600 }}>{formatCurrency(computedTotal)}</span>}
                             </button>
                             <button style={styles.secondaryButton} aria-label="Save to wishlist">
-                                💖 Save
+                                Save
                             </button>
                         </div>
                     </div>
@@ -342,13 +342,24 @@ const ViewProduct = () => {
             {/* Brought Together */}
             <div style={styles.relatedProductsSection}>
                 <h2 style={styles.relatedProductsTitle}>Brought Together</h2>
-                <ProductsCard productList={broughtTogetherProducts.slice(0, 4)} loading={loading} error={error} clickable={false} />
+                <ProductsCard
+                    productList={broughtTogetherProducts.slice(0, 4)}
+                    loading={loading}
+                    error={error}
+                    clickable={true}
+                />
             </div>
 
             {/* Related Products */}
             <div style={styles.relatedProductsSection}>
                 <h2 style={styles.relatedProductsTitle}>Related Products</h2>
-                <ProductsCard productList={productList.slice(0, 4)} loading={loading} error={error} clickable={true} />
+                <ProductsCard
+                    productList={productList.slice(0, 8)}
+                    loading={loading}
+                    error={error}
+                    clickable={true}
+                    randomEnabled={true}
+                />
             </div>
         </div>
     )

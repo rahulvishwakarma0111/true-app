@@ -1,14 +1,20 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
+import { randomProduct } from '../../constants/FilterOptionsList'
 
-const ProductsCard = ({ productList, loading, error, clickable }) => {
+const ProductsCard = ({ productList, loading, error, clickable, randomEnabled }) => {
 
     const navigate = useNavigate()
+
+
+    const showRandom = randomEnabled && Array.isArray(productList) && productList.length === 0
+    const displayedProducts = loading ? [] : (showRandom ? randomProduct : (productList || []))
+    const showNoResults = !loading && Array.isArray(productList) && productList.length === 0 && !randomEnabled
 
     return (
         <section className="products-section">
             <div className="products-inner">
-                {!loading && productList !== null && Array.isArray(productList) && productList.length === 0 && (
+                {showNoResults && (
                     <div className="no-results" style={{ padding: 12, color: '#666' }}>
                         No results found
                     </div>
@@ -30,7 +36,7 @@ const ProductsCard = ({ productList, loading, error, clickable }) => {
                             </article>
                         ))
                     ) : (
-                        productList?.map((p) => {
+                        displayedProducts?.map((p) => {
                             const src = p?._source || {}
                             const titleObj = src.title || {}
                             const enTitle = Array.isArray(titleObj.en)
