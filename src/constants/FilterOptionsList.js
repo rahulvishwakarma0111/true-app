@@ -1,4 +1,5 @@
   export const categories = [
+    'All Categories',
     'Telecommunication (Telco)',
     'Hardline Electronics'
   ]
@@ -13,16 +14,8 @@
     'vivo',
     'realme',
     'Huawei',
-    'Nokia',
-    'OnePlus',
-    'Infinix',
-    'TECNO',
     'Sony',
-    'Motorola',
-    'ASUS',
-    'Google',
     'HONOR',
-    'Lenovo'
   ];
 
 

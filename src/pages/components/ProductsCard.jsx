@@ -1,7 +1,7 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 
-const ProductsCard = ({productList, loading, error}) => {
+const ProductsCard = ({ productList, loading, error, clickable }) => {
 
     const navigate = useNavigate()
 
@@ -44,7 +44,7 @@ const ProductsCard = ({productList, loading, error}) => {
                             const discountPercent = src.discount_percent
 
                             return (
-                                <article className="product-card" key={p?._id} onClick={() => navigate(`/view-product/${p?._id}`, { state: { p } })}>
+                                <article className="product-card" key={p?._id} onClick={() => clickable !== false && navigate(`/view-product/${p?._id}`, { state: { p } })}>
                                     <div className="product-image">
                                         <img src={imageUrl} alt={displayTitle} />
                                     </div>

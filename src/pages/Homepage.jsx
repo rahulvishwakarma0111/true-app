@@ -13,7 +13,7 @@ const Homepage = () => {
   const [categoriesOpen, setCategoriesOpen] = useState(false)
   const [brandsOpen, setBrandsOpen] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState('All Categories')
-  const [selectedBrand, setSelectedBrand] = useState('All Brands')
+  const [selectedBrand, setSelectedBrand] = useState('All Mobile Brands')
   const [sortBy, setSortBy] = useState('popularity')
   const [searchText, setSearchText] = useState('');
   const { productList, loading, error, autoCompleteList,autocompleteLoading } = useSelector((state) => state.homepage);
@@ -30,6 +30,9 @@ const Homepage = () => {
   // Debounce timer ref
   const debounceTimer = useRef(null);
 
+  // Add: ref to suppress the brand-effect when we intentionally reset the brand during a search
+  const suppressBrandEffectRef = useRef(false);
+  
   // Map ES hit objects
   const storeItems = (autoCompleteList || []).map((hit, index) => ({
     id: hit._id || index,
@@ -73,8 +76,14 @@ const Homepage = () => {
       return;
     }
 
+    // Reset filters when performing an explicit search
+    // Suppress the brand-change effect so it does NOT trigger fetchAllProducts
+    suppressBrandEffectRef.current = true;
+    setSelectedBrand('All Mobile Brands');
+    setSelectedCategory('All Categories');
+
     await dispatch(searchProducts(q));
-  }, [dispatch]);
+  }, [dispatch, setSelectedBrand, setSelectedCategory]);
 
   const handleAutoComplete = useCallback(async (query) => {
     let q = typeof query === 'string' ? query.trim() : '';
@@ -161,7 +170,26 @@ const Homepage = () => {
   useEffect(() => {
     dispatch(fetchAllProducts());
   }, [dispatch])
+  
+  // Call searchProducts when a brand is selected from the dropdown.
+  // If "All Brands" is selected, show all products.
+  useEffect(() => {
+    // If suppression flag set, consume it and don't run the effect (prevents unwanted fetchAllProducts)
+    if (suppressBrandEffectRef.current) {
+      suppressBrandEffectRef.current = false;
+      return;
+    }
 
+    // avoid firing unnecessary search on initial load when default is "All Brands"
+    if (selectedBrand === 'All Mobile Brands') {
+      dispatch(fetchAllProducts());
+      return;
+    }
+
+    // trigger search for the selected brand
+    dispatch(searchProducts(selectedBrand));
+  }, [selectedBrand, dispatch]);
+  
   // New: clear handler passed into child to call fetchAllProducts
   const handleClear = useCallback(() => {
     setSearchText('');
@@ -295,7 +323,7 @@ const Homepage = () => {
       />
 
       {/* Products grid */}
-      <ProductsCard productList={sortedProducts} loading={loading} error={error} />
+      <ProductsCard productList={sortedProducts} loading={loading} error={error} clickable={true} />
     </div>
   )
 }
