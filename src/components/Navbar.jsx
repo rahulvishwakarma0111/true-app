@@ -42,8 +42,8 @@ const Navbar = () => {
             <a href="https://www.true.th/en" target='_blank'>Home Internet</a>
             <a href="/" target='_self'>Online Store</a>
             <a href="https://www.true.th/en" target='_blank'>Customer Services</a>
-            <a href="https://www.true.th/en" target='_blank'>Privileges</a>
-            <a href="https://www.true.th/en" target='_blank'>Network and Technology</a>
+            <a href="https://www.true.th/privilege" target='_blank'>Privileges</a>
+            <a href="https://www.true.th/true-network" target='_blank'>Network and Technology</a>
           </nav>
         </div>
       </div>
