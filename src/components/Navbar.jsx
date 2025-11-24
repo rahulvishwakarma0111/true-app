@@ -1,7 +1,11 @@
-import React from 'react'
+import React, { use } from 'react'
 import './Navbar.css'
+import { useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
+
+  const navigate = useNavigate();
+
   return (
     <header className="site-header">
       <div className="topbar">
@@ -20,10 +24,11 @@ const Navbar = () => {
 
       <div className="mainbar">
         <div className="mainbar-inner">
-          <div className="logo">
+          <div className="logo" onClick={() => navigate('/')}>
             <img
               src="https://images.contentstack.io/v3/assets/blt8ba403bee4433fd8/blt9a3c4613ba3a3eec/68111a30ecbf964b0e907070/Isolation_Mode.svg?branch=develop"
               alt="True logo"
+              style={{ cursor: 'pointer' }}
               className="logo-img"
             />
           </div>
